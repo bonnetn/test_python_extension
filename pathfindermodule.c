@@ -37,26 +37,22 @@ static PyObject* find_path(PyObject *self, PyObject *args)
         PyObject *v = PyList_GetItem(obj, i);
         if (v == NULL) {
             PyErr_SetString(PyExc_RuntimeError, "could not get value in list");
-            free(threadList);
-            return NULL;
+            goto err;
         }
         if (!PyLong_Check(v)) {
             PyErr_SetString(PyExc_TypeError, "all elements of the list must be ints");
-            free(threadList);
-            return NULL;
+            goto err;
         }
         thread_args *args = malloc(sizeof(thread_args));
         if (args == NULL) {
             PyErr_NoMemory();
-            free(threadList);
-            return NULL;
+            goto err;
         }
         args->i = i;
         args->v = PyLong_AsLong(v);
         if (pthread_create(&threadList[i], NULL, thread_func, (void*) args) != 0) {
             PyErr_SetString(PyExc_RuntimeError, "could not create thread");
-            free(threadList);
-            return NULL;
+            goto err;
         }
 
     }
@@ -67,6 +63,10 @@ static PyObject* find_path(PyObject *self, PyObject *args)
 
     free(threadList);
     return Py_None;
+
+err:
+    free(threadList);
+    return NULL;
 }
 
 static PyMethodDef pathfinderMethods[] = {
