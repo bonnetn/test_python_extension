@@ -46,9 +46,18 @@ static PyObject* find_path(PyObject *self, PyObject *args)
             return NULL;
         }
         thread_args *args = malloc(sizeof(thread_args));
+        if (args == NULL) {
+            PyErr_NoMemory();
+            free(threadList);
+            return NULL;
+        }
         args->i = i;
         args->v = PyLong_AsLong(v);
-        pthread_create(&threadList[i], NULL, thread_func, (void*) args);
+        if (pthread_create(&threadList[i], NULL, thread_func, (void*) args) != 0) {
+            PyErr_SetString(PyExc_RuntimeError, "could not create thread");
+            free(threadList);
+            return NULL;
+        }
 
     }
 
