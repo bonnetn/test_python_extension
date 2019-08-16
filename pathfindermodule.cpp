@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <queue>
 #include <thread>
 #include <vector>
 #include <optional>
@@ -26,14 +27,6 @@ bool operator!=(Vec2 a, Vec2 b) {
 std::ostream &operator<<(std::ostream &os, Vec2 const &v) {
     return os << "Vec2[" << v.x << ", " << v.y << "]";
 }
-
-struct Hash {
-    std::size_t operator()(Vec2 const &v) const noexcept {
-        std::size_t h1 = std::hash<long>{}(v.x);
-        std::size_t h2 = std::hash<long>{}(v.y);
-        return h1 ^ (h2 << 1);
-    }
-};
 
 
 template<typename T>
@@ -63,7 +56,7 @@ private:
 };
 
 double norm(Vec2 a) {
-    return sqrt(a.x * a.x + a.y * a.y);
+    return a.x * a.x + a.y * a.y;
 }
 
 double distance(Vec2 a, Vec2 b) {
@@ -73,24 +66,6 @@ double distance(Vec2 a, Vec2 b) {
     };
 
     return norm(c);
-}
-
-Vec2 get_min_dist(std::unordered_set<Vec2, Hash> const &Q, Vec2 start) {
-    if (Q.empty()) {
-        throw std::runtime_error{"empty set"};
-    }
-
-    Vec2 minVec{};
-    double minDist = std::numeric_limits<double>::infinity();
-    for (auto v: Q) {
-        auto d = distance(start, v);
-        if (d < minDist) {
-            minDist = d;
-            minVec = v;
-        }
-    }
-
-    return minVec;
 }
 
 bool inGrid(Vec2 p, long lenX, long lenY) {
@@ -117,79 +92,84 @@ std::vector<Vec2> get_neighbors(Vec2 p, long lenX, long lenY) {
     return result;
 }
 
+struct PriorityQueueElement {
+    Vec2 v;
+    double dist;
+};
+
+bool operator<(PriorityQueueElement a, PriorityQueueElement b) {
+    return a.dist > b.dist;
+}
+
 std::optional<std::vector<Vec2>> do_dijkstra(Grid2D<bool> grid, Vec2 start, Vec2 end) {
     /*
- 1  function Dijkstra(Graph, source):
- 2
- 3      create vertex set Q
- 4
- 5      for each vertex v in Graph:
- 6          dist[v] ← INFINITY
- 7          prev[v] ← UNDEFINED
- 8          add v to Q
-10      dist[source] ← 0
-11
-12      while Q is not empty:
-13          u ← vertex in Q with min dist[u]
-14
-15          remove u from Q
-16
-17          for each neighbor v of u:           // only v that are still in Q
-18              alt ← dist[u] + length(u, v)
-19              if alt < dist[v]:
-20                  dist[v] ← alt
-21                  prev[v] ← u
+     * From https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm :
+1  function Dijkstra(Graph, source):
+2      dist[source] ← 0                           // Initialization
+3
+4      create vertex priority queue Q
+5
+6      for each vertex v in Graph:
+7          if v ≠ source
+8              dist[v] ← INFINITY                 // Unknown distance from source to v
+9          prev[v] ← UNDEFINED                    // Predecessor of v
+10
+11         Q.add_with_priority(v, dist[v])
+12
+13
+14     while Q is not empty:                      // The main loop
+15         u ← Q.extract_min()                    // Remove and return best vertex
+16         for each neighbor v of u:              // only v that are still in Q
+17             alt ← dist[u] + length(u, v)
+18             if alt < dist[v]
+19                 dist[v] ← alt
+20                 prev[v] ← u
+21                 Q.decrease_priority(v, alt)
 22
-23      return dist[], prev[]
-     */
-    std::unordered_set<Vec2, Hash> Q{};
+23     return dist, prev     */
     double dist[grid.lengthX()][grid.lengthY()];
-    Vec2 prev[grid.lengthX()][grid.lengthY()];
-    for (long y = 0; y < grid.lengthY(); ++y) {
-        for (long x = 0; x < grid.lengthX(); ++x) {
-            dist[x][y] = std::numeric_limits<double>::infinity();
-            prev[x][y] = Vec2{0, 0};
-            Q.emplace(Vec2{x, y});
+    for(long i{0}; i<grid.lengthX(); i++) {
+        for(long j{0}; j<grid.lengthY(); j++) {
+            dist[i][j] = std::numeric_limits<double>::infinity();
         }
     }
+    Vec2 prev[grid.lengthX()][grid.lengthY()];
+    std::priority_queue<PriorityQueueElement> Q;
+    Q.push(PriorityQueueElement{.v=start,.dist=0});
+
     dist[start.x][start.y] = 0;
 
     while (!Q.empty()) {
-        auto u = get_min_dist(Q, start);
-        Q.erase(u);
-        if (u == end) {
-            break;
-        }
+        auto element = Q.top();
+        auto u = element.v;
+        Q.pop();
+        if (element.dist > dist[u.x][u.y])
+            continue;
 
         for (auto v: get_neighbors(u, grid.lengthX(), grid.lengthY())) {
-            if (grid.get(v.x, v.y)) {
+            if (grid.get(v.x, v.y))
                 continue;
-            }
-            if (Q.find(v) == Q.end()) {
-                continue;
-            }
+
             auto alt = dist[u.x][u.y] + distance(u, v);
             if (alt < dist[v.x][v.y]) {
                 dist[v.x][v.y] = alt;
                 prev[v.x][v.y] = u;
+                Q.push(PriorityQueueElement{.v=v, .dist=alt});
             }
         }
     }
-
-
-    auto d = dist[end.x][end.y];
-    if (d == std::numeric_limits<double>::infinity()) {
+    if (dist[end.x][end.y] == std::numeric_limits<double>::infinity()) {
         return {};
     }
 
-    std::vector<Vec2> path;
+    std::vector<Vec2> result;
     Vec2 cur = end;
     while (cur != start) {
-        path.emplace_back(cur);
+        result.emplace_back(cur);
         cur = prev[cur.x][cur.y];
     }
-    path.emplace_back(start);
-    return {path};
+    result.emplace_back(start);
+    return {result};
 }
 
 static PyObject *dijkstra(PyObject *self, PyObject *args) {
@@ -261,7 +241,7 @@ static PyObject *dijkstra(PyObject *self, PyObject *args) {
 
 static PyMethodDef pathfinderMethods[] = {
         {"dijkstra", dijkstra, METH_VARARGS, "Find the shortest path between two points"},
-        {nullptr,     nullptr, 0,              nullptr}
+        {nullptr,    nullptr, 0,             nullptr}
 };
 
 static struct PyModuleDef pathfinderModule = {
