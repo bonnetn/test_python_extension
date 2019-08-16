@@ -14,7 +14,8 @@ virtualenv venv
 source venv/bin/activate
 
 python3 setup.py build install
-python3 test.py
+
+python3 test.py # If you want to run the benchmarks.
 ```
 
 ## How to use?
