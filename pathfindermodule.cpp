@@ -143,7 +143,7 @@ std::optional<std::vector<Vec2>> do_dijkstra(Grid2D<bool> grid, Vec2 start, Vec2
         auto element = Q.top();
         auto u = element.v;
         Q.pop();
-        if (element.dist > dist[u.x][u.y])
+        if (element.dist != dist[u.x][u.y])
             continue;
 
         for (auto v: get_neighbors(u, grid.lengthX(), grid.lengthY())) {
