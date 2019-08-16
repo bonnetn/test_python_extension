@@ -33,3 +33,11 @@ Python lib       0.762 milliseconds for 100 iterations
 Median time:
 Extension is 1805 times faster than python.
 ```
+
+Histogram using CPython extension:
+![Extension](img/extension.png?raw=true "Extension")
+
+
+
+Histogram using "pathfinding" python library:
+![Python library](img/python_lib.png?raw=true "Python library")
