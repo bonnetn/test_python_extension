@@ -7,7 +7,7 @@ I have re-implemented Dijkstra's pathfinding algorithm in C++ and made an extens
 The `test.py` file contains some benchmark which compares the performance of this extension against the [pathfinding](https://pypi.org/project/pathfinding/) library.
 
 
-## How to use?
+## How to build?
 
 ```bash
 virtualenv venv
@@ -15,6 +15,25 @@ source venv/bin/activate
 
 python3 setup.py build install
 python3 test.py
+```
+
+## How to use?
+
+```python
+import pathfinder
+import numpy
+
+# Create a ndarray of bools which represents your map.
+map = numpy.zeros((100,100), dtype=bool)
+
+# True represents an obstacle
+map[1,3] = True
+
+# Find the path between (0,0) and (99,99):
+path = pathfinder.dijkstra(map, (0,0), (99,99))
+
+# If there is no path, the function returns None, otherwise it returns a list with all the positions from the start to the end.
+print(path)
 ```
 
 ## Results
