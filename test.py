@@ -2,6 +2,7 @@ import timeit
 import numpy
 import matplotlib.pyplot as plt
 import random
+import gc
 import time
 
 import numpy
@@ -10,14 +11,17 @@ from pathfinding.core.diagonal_movement import DiagonalMovement
 from pathfinding.core.grid import Grid
 from pathfinding.finder.dijkstra import DijkstraFinder
 
-TEST_COUNT = int(1e2)
 t_extension = []
 t_lib_python = []
 
 # Side of the grid.
+TEST_COUNT = int(1e2)
 x = 100
 y = 100
 p = 0.8
+
+# Disable the garbage collection during the test.
+gc.disable()
 
 # Benchmark
 print(f"Running {TEST_COUNT} tests")
@@ -25,6 +29,8 @@ print("----------------------------------")
 for i in range(TEST_COUNT):
     ext_path = None
     while not ext_path:
+        gc.collect() # Manual garbage collection outside of the time measurements.
+
         # Generate map.
         obstacles = numpy.random.choice(a=[False, True], size=(x, y), p=[p, 1 - p])
 
@@ -51,14 +57,15 @@ for i in range(TEST_COUNT):
         if lib_path and ext_path:
             t_lib_python.append(lib_time)
             t_extension.append(ext_time)
-            print(f"{i+1:>3}/{TEST_COUNT} - Done: {lib_time*1000:.3f}ms / {ext_time*1000:.3f}ms")
+            print(f"{i + 1:>4}/{TEST_COUNT} - Done: {lib_time * 1000:.3f}ms / {ext_time * 1000:.3f}ms")
 
         elif not lib_path and not ext_path:
-            print(f"{i+1:>3}/{TEST_COUNT} - No path, retrying...")
+            print(f"{i + 1:>4}/{TEST_COUNT} - No path, retrying...")
 
         else:
             raise RuntimeError("Bad state!")
 
+gc.enable()
 t_extension_ms = [t * 1000 for t in t_extension]
 t_lib_python_ms = [t * 1000 for t in t_lib_python]
 
@@ -68,10 +75,9 @@ print("Python lib  {:>10.3f} milliseconds".format(numpy.median(t_lib_python_ms))
 print("----------------------------------")
 print(f"Extension is {numpy.median(t_lib_python) / numpy.median(t_extension):.1f} times faster than python.")
 
-t_extension_ms.sort()
-t_lib_python_ms.sort()
+BINS = 50
 
-plt.hist(t_extension_ms, 40, facecolor='g', alpha=0.75)
+plt.hist(t_extension_ms, BINS, facecolor='g', alpha=0.75)
 plt.xlabel(f'Time [ms]')
 plt.title("CPython extension m={:.3f} avg={:.3f} σ = {:.3f}".format(
     numpy.median(t_extension_ms),
@@ -79,9 +85,10 @@ plt.title("CPython extension m={:.3f} avg={:.3f} σ = {:.3f}".format(
     numpy.nanstd(t_extension_ms),
 ))
 plt.grid(True)
+plt.savefig('img/extension.png')
 
 plt.figure()
-plt.hist(t_lib_python_ms, 40, facecolor='r', alpha=0.75)
+plt.hist(t_lib_python_ms, BINS, facecolor='r', alpha=0.75)
 plt.xlabel(f'Time [ms]')
 plt.title("Library Pathfinding python m={:.3f} avg={:.3f} σ = {:.3f}".format(
     numpy.median(t_lib_python_ms),
@@ -89,5 +96,6 @@ plt.title("Library Pathfinding python m={:.3f} avg={:.3f} σ = {:.3f}".format(
     numpy.nanstd(t_lib_python_ms),
 ))
 plt.grid(True)
+plt.savefig('img/python_lib.png')
 
 plt.show()
