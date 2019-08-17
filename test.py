@@ -10,7 +10,7 @@ from pathfinding.core.diagonal_movement import DiagonalMovement
 from pathfinding.core.grid import Grid
 from pathfinding.finder.dijkstra import DijkstraFinder
 
-TEST_COUNT = int(1e3)
+TEST_COUNT = int(1e2)
 t_extension = []
 t_lib_python = []
 
@@ -23,32 +23,41 @@ p = 0.8
 print(f"Running {TEST_COUNT} tests")
 print("----------------------------------")
 for i in range(TEST_COUNT):
-    print(f"{i}/{TEST_COUNT}")
-    # Generate map.
-    obstacles = numpy.random.choice(a=[False, True], size=(x, y), p=[p, 1 - p])
+    ext_path = None
+    while not ext_path:
+        # Generate map.
+        obstacles = numpy.random.choice(a=[False, True], size=(x, y), p=[p, 1 - p])
 
-    obstacles[0, 0] = False
-    obstacles[x - 1, y - 1] = False
+        # Make sure start and end are free.
+        obstacles[0, 0] = False
+        obstacles[x - 1, y - 1] = False
 
-    # Other lib ini
-    grid = Grid(matrix=numpy.logical_not(obstacles))
-    start = grid.node(0, 0)
-    end = grid.node(x - 1, y - 1)
-    finder = DijkstraFinder(diagonal_movement=DiagonalMovement.always)
+        # Initialize python library.
+        grid = Grid(matrix=numpy.logical_not(obstacles))
+        start = grid.node(0, 0)
+        end = grid.node(x - 1, y - 1)
+        finder = DijkstraFinder(diagonal_movement=DiagonalMovement.always)
 
-    start_time = time.time()
-    path = pathfinder.dijkstra(obstacles, (0, 0), (x - 1, y - 1))
-    ext_time = time.time() - start_time
+        # Benchmark extension.
+        start_time = time.time()
+        ext_path = pathfinder.dijkstra(obstacles, (0, 0), (x - 1, y - 1))
+        ext_time = time.time() - start_time
 
-    start_time = time.time()
-    paths, runs = finder.find_path(start, end, grid)
-    lib_time = time.time() - start_time
+        # Benchmark python library.
+        start_time = time.time()
+        lib_path, runs = finder.find_path(start, end, grid)
+        lib_time = time.time() - start_time
 
-    if (paths and path) or (not paths and not path):
-        t_lib_python.append(lib_time)
-        t_extension.append(ext_time)
-    else:
-        raise RuntimeError("Bad state!")
+        if lib_path and ext_path:
+            t_lib_python.append(lib_time)
+            t_extension.append(ext_time)
+            print(f"{i+1:>3}/{TEST_COUNT} - Done: {lib_time*1000:.3f}ms / {ext_time*1000:.3f}ms")
+
+        elif not lib_path and not ext_path:
+            print(f"{i+1:>3}/{TEST_COUNT} - No path, retrying...")
+
+        else:
+            raise RuntimeError("Bad state!")
 
 t_extension_ms = [t * 1000 for t in t_extension]
 t_lib_python_ms = [t * 1000 for t in t_lib_python]
