@@ -49,10 +49,10 @@ Both algorithms (pathfinding lib and cpython extention) were tested against the 
 
 ```
 Median:
-Extension        2.889 milliseconds
-Python lib     253.713 milliseconds
+Extension        2.109 milliseconds
+Python lib     258.623 milliseconds
 ----------------------------------
-Extension is 87.8 times faster than python.
+Extension is 122.7 times faster than python.
 ```
 
 Histogram using CPython extension:
