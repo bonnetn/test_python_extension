@@ -41,17 +41,18 @@ print(path)
 
 To see the results, you can run `test.py`. Here are the results I got running it on my laptop.
 
-The benchmarks were run on a grid of **100x100** cells, with obstacles placed randomly (uniform) on the map with a probility **p=0.6**.
-The algorithm are tested on 500 different random maps. The algorithm is run 100 times. 
+The benchmarks were run on a grid of **100x100** cells, with obstacles placed randomly (uniform distribution) on the map with a probility of **p=0.8**.
+The algorithm was tested on 1000 times, with a different map for each test.
+
+Both algorithms (pathfinding lib and cpython extention) were tested against the same set of map.
 
 
 ```
-Minimum times:
-Extension        0.069 milliseconds for 100 iterations
-Python lib       0.762 milliseconds for 100 iterations
+Median:
+Extension        2.889 milliseconds
+Python lib     253.713 milliseconds
 ----------------------------------
-Median time:
-Extension is 1805 times faster than python.
+Extension is 87.8 times faster than python.
 ```
 
 Histogram using CPython extension:
