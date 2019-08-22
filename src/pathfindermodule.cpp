@@ -41,7 +41,7 @@ static PyObject *dijkstra_handler(PyObject *self, PyObject *args) {
     // Release the GIL while finding the path.
     Py_BEGIN_ALLOW_THREADS
 
-        path = find_path_with_dijkstra(grid, start, end);
+        path = dijkstra::find_path(grid, start, end);
 
         // Acquire back the GIL.
     Py_END_ALLOW_THREADS
