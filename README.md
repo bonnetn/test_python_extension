@@ -13,9 +13,21 @@ The `test.py` file contains some benchmark which compares the performance of thi
 virtualenv venv
 source venv/bin/activate
 
+make clean build install
+make benchmark # If you want to run the benchmark.
+make single_run # If you want to run it once and see the results.
+```
+
+**OR**
+
+```bash
+virtualenv venv
+source venv/bin/activate
+
 python3 setup.py build install
 
-python3 test.py # If you want to run the benchmarks.
+python3 test.py # If you want to run the benchmark.
+python3 single_run.py # If you want to run it once and see the results.
 ```
 
 ## How to use?
