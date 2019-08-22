@@ -21,7 +21,7 @@ bool operator!=(Vector2<T> const &a, Vector2<T> const &b) {
 
 template<typename T>
 std::ostream &operator<<(std::ostream &os, Vector2<T> const &v) {
-    return os << "Vec2[" << v.x << ", " << v.y << "]";
+    return os << "T[" << v.x << ", " << v.y << "]";
 }
 
 template<typename T>

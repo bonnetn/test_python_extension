@@ -5,6 +5,7 @@
 #include <limits>
 #include <queue>
 #include <optional>
+#include "priority_queue_element.h"
 
 
 template<typename T>
@@ -14,17 +15,6 @@ template<typename T>
 using ObstacleMap = MapGrid<T, bool>;
 
 constexpr double INF = std::numeric_limits<double>::infinity();
-
-template<typename Vec2>
-struct PriorityQueueElement {
-    Vec2 v;
-    double dist;
-};
-
-template<typename Vec2>
-bool operator<(PriorityQueueElement<Vec2> const &a, PriorityQueueElement<Vec2> const &b) {
-    return a.dist > b.dist;
-}
 
 template<typename Vec2>
 std::pair<Array2D<Vec2>, Array2D<double>> dijkstra(ObstacleMap<Vec2> grid, Vec2 start, Vec2 end) {
@@ -57,8 +47,8 @@ std::pair<Array2D<Vec2>, Array2D<double>> dijkstra(ObstacleMap<Vec2> grid, Vec2 
     auto prev = Array2D<Vec2>(grid.dimensions().y, std::vector<Vec2>(grid.dimensions().y));
 
 
-    std::priority_queue<PriorityQueueElement<Vec2>> Q;
-    Q.push(PriorityQueueElement<Vec2>{.v=start, .dist=0});
+    PriorityQueue<Vec2> Q;
+    Q.push({.v=start, .dist=0});
 
     dist[start.x][start.y] = 0;
 
@@ -77,7 +67,7 @@ std::pair<Array2D<Vec2>, Array2D<double>> dijkstra(ObstacleMap<Vec2> grid, Vec2 
             if (alt < dist[v.x][v.y]) {
                 dist[v.x][v.y] = alt;
                 prev[v.x][v.y] = u;
-                Q.push(PriorityQueueElement<Vec2>{.v=v, .dist=alt});
+                Q.push({.v=v, .dist=alt});
 
                 if (v == end) {
                     return std::make_pair(prev, dist);
