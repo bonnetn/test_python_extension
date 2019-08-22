@@ -14,6 +14,16 @@ typedef std::vector<std::vector<double>> Array2DDouble;
 
 constexpr double INF = std::numeric_limits<double>::infinity();
 
+struct PriorityQueueElement {
+    Vec2 v;
+    double dist;
+
+};
+
+bool operator<(PriorityQueueElement const &a, PriorityQueueElement const &b) {
+    return a.dist > b.dist;
+}
+
 std::pair<Array2DVec2, Array2DDouble> dijkstra(ObstacleMap grid, Vec2 start, Vec2 end) {
     /*
      * From https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm :
@@ -43,14 +53,6 @@ std::pair<Array2DVec2, Array2DDouble> dijkstra(ObstacleMap grid, Vec2 start, Vec
     Array2DDouble dist(grid.lengthX(), std::vector<double>(grid.lengthY(), INF));
     Array2DVec2 prev(grid.lengthX(), std::vector<Vec2>(grid.lengthX()));
 
-    struct PriorityQueueElement {
-        Vec2 v;
-        double dist;
-
-        bool operator<(PriorityQueueElement b) {
-            return dist > b.dist;
-        }
-    };
 
     std::priority_queue<PriorityQueueElement> Q;
     Q.push(PriorityQueueElement{.v=start, .dist=0});

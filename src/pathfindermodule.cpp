@@ -3,6 +3,7 @@
 #include <Python.h>
 
 #include <vector>
+#include <optional>
 #include <numpy/arrayobject.h>
 #include "pathfinding/grid.h"
 #include "pathfinding/dijkstra.h"
@@ -36,10 +37,12 @@ static PyObject *dijkstra_handler(PyObject *self, PyObject *args) {
             PyArray_DIM(arr, 1),
     };
 
+    std::optional<std::vector<Vec2>> path;
+
     // Release the GIL while finding the path.
     Py_BEGIN_ALLOW_THREADS
 
-    auto path = find_path(grid, start, end);
+    path = find_path_with_dijkstra(grid, start, end);
 
     // Acquire back the GIL.
     Py_END_ALLOW_THREADS
