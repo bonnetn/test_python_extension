@@ -43,6 +43,9 @@ namespace astar {
                 }
 
                 openSet.pop();
+                if (closedSet[current.x][current.y]) {
+                    continue;
+                }
                 closedSet[current.x][current.y] = true;
 
                 for (auto neighbor : get_neighbors(current, grid)) {
