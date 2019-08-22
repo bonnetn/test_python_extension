@@ -43,8 +43,8 @@ static PyObject *dijkstra_handler(PyObject *self, PyObject *args) {
 
         path = dijkstra::find_path(grid, start, end);
 
-    // Acquire back the GIL.
-    Py_END_ALLOW_THREADS
+
+    Py_END_ALLOW_THREADS // Acquire back the GIL.
 
     if (!path) {
         return Py_None;

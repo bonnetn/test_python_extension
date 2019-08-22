@@ -35,21 +35,28 @@ bool inGrid(Vec p, MapGrid<Vec, Cell> const &grid) {
     return p.x >= 0 && p.x < dim.x && p.y >= 0 && p.y < dim.y;
 }
 
+const Vector2<long> neighbors[]{
+        {.x=1, .y=0},
+        {.x=0, .y=-1},
+        {.x=-1, .y=0},
+        {.x=0, .y=1},
+
+        {.x=1, .y=-1},
+        {.x=-1, .y=-1},
+        {.x=-1, .y=1},
+        {.x=1, .y=1},
+};
+
 template<typename Vec, typename Cell>
 std::vector<Vec> get_neighbors(Vec p, MapGrid<Vec, Cell> const &grid) {
     std::vector<Vec> result;
-    for (auto x = -1; x <= 1; x++) {
-        for (auto y = -1; y <= 1; y++) {
-            if (x == 0 && y == 0) {
-                continue;
-            }
-            auto v = Vec{
-                    p.x + x,
-                    p.y + y,
-            };
-            if (inGrid(v, grid)) {
-                result.emplace_back(v);
-            }
+    for (auto const &n : neighbors) {
+        auto v = Vec{
+                .x=p.x + n.x,
+                .y=p.y + n.y,
+        };
+        if (inGrid(v, grid)) {
+            result.emplace_back(v);
         }
     }
 
