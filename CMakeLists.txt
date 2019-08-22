@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 project(pathfinder)
-add_executable(pathfinder src/pathfindermodule.cpp src/pathfinding/vector2.h src/pathfinding/grid.h src/pathfinding/dijkstra.h)
+add_executable(pathfinder src/pathfindermodule.cpp src/pathfinding/vector2.h src/pathfinding/grid.h src/pathfinding/dijkstra.h src/pathfinding/priority_queue_element.h)
 set(CMAKE_CXX_STANDARD 17)
 
 find_package(PythonLibs REQUIRED)
