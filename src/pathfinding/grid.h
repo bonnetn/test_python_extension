@@ -3,49 +3,47 @@
 
 #include "vector2.h"
 
-template<typename Axis, typename Cell>
+template<typename Vec, typename Cell>
 class MapGrid {
 public:
-    MapGrid(Cell *grid, Axis strideX, Axis strideY, Axis lenX, Axis lenY) :
-            _grid(grid), _strideX(strideX), _strideY(strideY), _lenX(lenX), _lenY(lenY) {};
+    MapGrid(Cell *grid, Vec strides, Vec dimensions) :
+            _grid(grid), _strides(strides), _dimensions(dimensions) {};
 
-    long lengthX() const { return _lenX; }
+    const Vec dimensions() const { return _dimensions; }
 
-    long lengthY() const { return _lenY; }
-
-    bool get(Vector2<Axis> v) const {
+    bool get(Vec v) const {
         auto x = v.x;
         auto y = v.y;
 
-        if (x < 0 || x >= _lenX) {
+        if (x < 0 || x >= _dimensions.x) {
             throw std::runtime_error("out of bounds");
         }
-        if (y < 0 || y >= _lenY) {
+        if (y < 0 || y >= _dimensions.y) {
             throw std::runtime_error("out of bounds");
         }
-        return *(_grid + _strideX * x + _strideY * y);
+        return *(_grid + _strides.x * x + _strides.y * y);
     }
 
 private:
     Cell *_grid;
-    Axis _strideX, _strideY;
-    Axis _lenX, _lenY;
+    Vec _strides, _dimensions;
 };
 
-template<typename Axis, typename Cell>
-bool inGrid(Vector2<Axis> p, MapGrid<Axis, Cell> const &grid) {
-    return p.x >= 0 && p.x < grid.lengthX() && p.y >= 0 && p.y < grid.lengthY();
+template<typename Vec, typename Cell>
+bool inGrid(Vec p, MapGrid<Vec, Cell> const &grid) {
+    auto dim = grid.dimensions();
+    return p.x >= 0 && p.x < dim.x && p.y >= 0 && p.y < dim.y;
 }
 
-template<typename Axis, typename Cell>
-std::vector<Vector2<Axis>> get_neighbors(Vector2<Axis> p, MapGrid<Axis, Cell> const &grid) {
-    std::vector<Vector2<Axis>> result;
+template<typename Vec, typename Cell>
+std::vector<Vec> get_neighbors(Vec p, MapGrid<Vec, Cell> const &grid) {
+    std::vector<Vec> result;
     for (auto x = -1; x <= 1; x++) {
         for (auto y = -1; y <= 1; y++) {
             if (x == 0 && y == 0) {
                 continue;
             }
-            auto v = Vector2<Axis>{
+            auto v = Vec{
                     p.x + x,
                     p.y + y,
             };

@@ -7,7 +7,7 @@
 #include <optional>
 
 typedef Vector2<long> Vec2;
-typedef MapGrid<long, bool> ObstacleMap;
+typedef MapGrid<Vec2, bool> ObstacleMap;
 
 typedef std::vector<std::vector<Vec2>> Array2DVec2;
 typedef std::vector<std::vector<double>> Array2DDouble;
@@ -50,8 +50,8 @@ std::pair<Array2DVec2, Array2DDouble> dijkstra(ObstacleMap grid, Vec2 start, Vec
 21                 Q.decrease_priority(v, alt)
 22
 23     return dist, prev     */
-    Array2DDouble dist(grid.lengthX(), std::vector<double>(grid.lengthY(), INF));
-    Array2DVec2 prev(grid.lengthX(), std::vector<Vec2>(grid.lengthX()));
+    Array2DDouble dist(grid.dimensions().x, std::vector<double>(grid.dimensions().y, INF));
+    Array2DVec2 prev(grid.dimensions().y, std::vector<Vec2>(grid.dimensions().y));
 
 
     std::priority_queue<PriorityQueueElement> Q;
