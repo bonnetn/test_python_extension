@@ -8,6 +8,7 @@
 #include "pathfinding/grid.h"
 #include "pathfinding/dijkstra.h"
 
+typedef Vector2<long> Vec2;
 
 static PyObject *dijkstra_handler(PyObject *self, PyObject *args) {
     PyObject *arrayObject;
@@ -35,7 +36,7 @@ static PyObject *dijkstra_handler(PyObject *self, PyObject *args) {
             Vector2<long>{PyArray_DIM(arr, 0), PyArray_DIM(arr, 1)}
     };
 
-    std::optional<std::vector<Vector2<long>>> path;
+    std::optional<std::vector<Vec2>> path;
 
     // Release the GIL while finding the path.
     Py_BEGIN_ALLOW_THREADS
