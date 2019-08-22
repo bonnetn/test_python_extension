@@ -25,12 +25,12 @@ std::ostream &operator<<(std::ostream &os, Vector2<T> const &v) {
 }
 
 template<typename T>
-double norm2(Vector2<T> const& a) {
+double norm2(Vector2<T> const &a) {
     return a.x * a.x + a.y * a.y;
 }
 
 template<typename T>
-double distance(Vector2<T> const& a, Vector2<T> const& b) {
+double distance(Vector2<T> const &a, Vector2<T> const &b) {
     Vector2<T> c{
             a.x - b.x,
             a.y - b.y,

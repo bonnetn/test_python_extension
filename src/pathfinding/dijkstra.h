@@ -52,9 +52,9 @@ namespace dijkstra {
 
             while (!Q.empty()) {
                 auto element = Q.top();
-                auto u = element.getV();
+                auto u = element.v;
                 Q.pop();
-                if (element.getDist() != dist[u.x][u.y])
+                if (element.dist != dist[u.x][u.y])
                     continue;
 
                 for (auto v: get_neighbors(u, grid)) {

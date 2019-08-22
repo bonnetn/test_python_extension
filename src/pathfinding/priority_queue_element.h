@@ -7,19 +7,13 @@
 
 template<typename T>
 struct PriorityQueueElement {
-    PriorityQueueElement(T v, double dist): v{v},dist{dist} {};
-
-    T getV() const { return v; };
-    double getDist() const { return dist; };
-
-private:
     T v;
     double dist;
 };
 
 template<typename T>
 bool operator<(PriorityQueueElement<T> const &a, PriorityQueueElement<T> const &b) {
-    return a.getDist() > b.getDist();
+    return a.dist > b.dist;
 }
 
 template<typename T>
