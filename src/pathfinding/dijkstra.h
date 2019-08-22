@@ -6,25 +6,28 @@
 #include <queue>
 #include <optional>
 
-typedef Vector2<long> Vec2;
-typedef MapGrid<Vec2, bool> ObstacleMap;
 
-typedef std::vector<std::vector<Vec2>> Array2DVec2;
-typedef std::vector<std::vector<double>> Array2DDouble;
+template<typename T>
+using Array2D = std::vector<std::vector<T>>;
+
+template<typename T>
+using ObstacleMap = MapGrid<T, bool>;
 
 constexpr double INF = std::numeric_limits<double>::infinity();
 
+template<typename Vec2>
 struct PriorityQueueElement {
     Vec2 v;
     double dist;
-
 };
 
-bool operator<(PriorityQueueElement const &a, PriorityQueueElement const &b) {
+template<typename Vec2>
+bool operator<(PriorityQueueElement<Vec2> const &a, PriorityQueueElement<Vec2> const &b) {
     return a.dist > b.dist;
 }
 
-std::pair<Array2DVec2, Array2DDouble> dijkstra(ObstacleMap grid, Vec2 start, Vec2 end) {
+template<typename Vec2>
+std::pair<Array2D<Vec2>, Array2D<double>> dijkstra(ObstacleMap<Vec2> grid, Vec2 start, Vec2 end) {
     /*
      * From https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm :
 1  function Dijkstra(Graph, source):
@@ -50,12 +53,12 @@ std::pair<Array2DVec2, Array2DDouble> dijkstra(ObstacleMap grid, Vec2 start, Vec
 21                 Q.decrease_priority(v, alt)
 22
 23     return dist, prev     */
-    Array2DDouble dist(grid.dimensions().x, std::vector<double>(grid.dimensions().y, INF));
-    Array2DVec2 prev(grid.dimensions().y, std::vector<Vec2>(grid.dimensions().y));
+    auto dist = Array2D<double>(grid.dimensions().x, std::vector<double>(grid.dimensions().y, INF));
+    auto prev = Array2D<Vec2>(grid.dimensions().y, std::vector<Vec2>(grid.dimensions().y));
 
 
-    std::priority_queue<PriorityQueueElement> Q;
-    Q.push(PriorityQueueElement{.v=start, .dist=0});
+    std::priority_queue<PriorityQueueElement<Vec2>> Q;
+    Q.push(PriorityQueueElement<Vec2>{.v=start, .dist=0});
 
     dist[start.x][start.y] = 0;
 
@@ -74,18 +77,19 @@ std::pair<Array2DVec2, Array2DDouble> dijkstra(ObstacleMap grid, Vec2 start, Vec
             if (alt < dist[v.x][v.y]) {
                 dist[v.x][v.y] = alt;
                 prev[v.x][v.y] = u;
-                Q.push(PriorityQueueElement{.v=v, .dist=alt});
+                Q.push(PriorityQueueElement<Vec2>{.v=v, .dist=alt});
 
                 if (v == end) {
-                    return std::pair<Array2DVec2, Array2DDouble>(prev, dist);
+                    return std::make_pair(prev, dist);
                 }
             }
         }
     }
-    return std::pair<Array2DVec2, Array2DDouble>(prev, dist);
+    return std::make_pair(prev, dist);
 }
 
-std::optional<std::vector<Vec2>> find_path_with_dijkstra(ObstacleMap grid, Vec2 start, Vec2 end) {
+template<typename Vec2>
+std::optional<std::vector<Vec2>> find_path_with_dijkstra(ObstacleMap<Vec2> grid, Vec2 start, Vec2 end) {
     auto[prev, dist] = dijkstra(grid, start, end);
 
     if (dist[end.x][end.y] == INF) {
