@@ -8,18 +8,14 @@
 #include "priority_queue_element.h"
 
 namespace dijkstra {
-
     namespace {
         template<typename T>
         using Array2D = std::vector<std::vector<T>>;
 
-        template<typename T>
-        using ObstacleMap = MapGrid<T, bool>;
-
         constexpr double INF = std::numeric_limits<double>::infinity();
 
         template<typename Vec2>
-        std::pair<Array2D<Vec2>, Array2D<double>> dijkstra(ObstacleMap<Vec2> grid, Vec2 start, Vec2 end) {
+        std::pair<Array2D<Vec2>, Array2D<double>> dijkstra(MapGrid<Vec2, bool> grid, Vec2 start, Vec2 end) {
             /*
              * From https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm :
         1  function Dijkstra(Graph, source):
@@ -82,7 +78,7 @@ namespace dijkstra {
     }
 
     template<typename Vec2>
-    std::optional<std::vector<Vec2>> find_path(ObstacleMap<Vec2> grid, Vec2 start, Vec2 end) {
+    std::optional<std::vector<Vec2>> find_path(MapGrid<Vec2, bool> grid, Vec2 start, Vec2 end) {
         auto[prev, dist] = dijkstra(grid, start, end);
 
         if (dist[end.x][end.y] == INF) {

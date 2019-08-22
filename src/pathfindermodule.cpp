@@ -30,10 +30,10 @@ static PyObject *dijkstra_handler(PyObject *self, PyObject *args) {
         return nullptr;
     }
 
-    auto grid = MapGrid<Vector2<long>, bool>{
+    auto grid = MapGrid<Vec2, bool>{
             static_cast<bool *>(PyArray_DATA(arr)),
-            Vector2<long>{PyArray_STRIDE(arr, 0), PyArray_STRIDE(arr, 1)},
-            Vector2<long>{PyArray_DIM(arr, 0), PyArray_DIM(arr, 1)}
+            {PyArray_STRIDE(arr, 0), PyArray_STRIDE(arr, 1)},
+            {PyArray_DIM(arr, 0), PyArray_DIM(arr, 1)}
     };
 
     std::optional<std::vector<Vec2>> path;
@@ -43,7 +43,7 @@ static PyObject *dijkstra_handler(PyObject *self, PyObject *args) {
 
         path = dijkstra::find_path(grid, start, end);
 
-        // Acquire back the GIL.
+    // Acquire back the GIL.
     Py_END_ALLOW_THREADS
 
     if (!path) {
