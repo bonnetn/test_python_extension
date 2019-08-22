@@ -8,6 +8,7 @@
 #include <functional>
 #include "pathfinding/grid.h"
 #include "pathfinding/dijkstra.h"
+#include "pathfinding/astar.h"
 
 
 using Vec2 = Vector2<long>;
@@ -92,8 +93,13 @@ static PyObject *dijkstra_handler(PyObject *self, PyObject *args) {
     return handler(self, args, dijkstra::find_path<Vec2>);
 }
 
+static PyObject *astar_handler(PyObject *self, PyObject *args) {
+    return handler(self, args, astar::find_path<Vec2>);
+}
+
 static PyMethodDef pathfinderMethods[] = {
         {"dijkstra", dijkstra_handler, METH_VARARGS, "Find the shortest path between two points"},
+        {"astar",    astar_handler,    METH_VARARGS, "Find the shortest path between two points"},
         {nullptr,    nullptr, 0,                     nullptr}
 };
 
