@@ -5,12 +5,15 @@
 #include <vector>
 #include <optional>
 #include <numpy/arrayobject.h>
+#include <functional>
 #include "pathfinding/grid.h"
 #include "pathfinding/dijkstra.h"
 
-typedef Vector2<long> Vec2;
 
-static PyObject *dijkstra_handler(PyObject *self, PyObject *args) {
+using Vec2 = Vector2<long>;
+
+template<typename Function>
+static PyObject *handler(PyObject *self, PyObject *args, Function find_path) {
     PyObject *arrayObject;
     Vector2<long> start{};
     Vector2<long> end{};
@@ -41,7 +44,7 @@ static PyObject *dijkstra_handler(PyObject *self, PyObject *args) {
     // Release the GIL while finding the path.
     Py_BEGIN_ALLOW_THREADS
 
-        path = dijkstra::find_path(grid, start, end);
+        path = find_path(grid, start, end);
 
 
     Py_END_ALLOW_THREADS // Acquire back the GIL.
@@ -82,6 +85,11 @@ static PyObject *dijkstra_handler(PyObject *self, PyObject *args) {
         return nullptr;
     }
     return list;
+}
+
+
+static PyObject *dijkstra_handler(PyObject *self, PyObject *args) {
+    return handler(self, args, dijkstra::find_path<Vec2>);
 }
 
 static PyMethodDef pathfinderMethods[] = {
