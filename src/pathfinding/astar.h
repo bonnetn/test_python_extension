@@ -23,17 +23,18 @@ namespace astar {
         template<typename Vec2>
         std::pair<Array2D<Vec2>, Array2D<double>>
         astar(MapGrid<Vec2, bool> const &grid, Vec2 const &start, Vec2 const &end) {
+            auto dim = grid.dimensions();
 
             auto openSet = PriorityQueue<Vec2>{};
             openSet.push({start, 0});
-            auto closedSet = Array2D<bool>(grid.dimensions().x, std::vector<bool>(grid.dimensions().y, false));
+            auto closedSet = Array2D<bool>(dim.x, std::vector<bool>(dim.y, false));
 
-            auto cameFrom = Array2D<Vec2>(grid.dimensions().x, std::vector<Vec2>(grid.dimensions().y));
+            auto cameFrom = Array2D<Vec2>(dim.x, std::vector<Vec2>(dim.y));
 
-            auto gScore = Array2D<double>(grid.dimensions().x, std::vector<double>(grid.dimensions().y, INF));
+            auto gScore = Array2D<double>(dim.x, std::vector<double>(dim.y, INF));
             gScore[start.x][start.y] = 0;
 
-            auto fScore = Array2D<double>(grid.dimensions().x, std::vector<double>(grid.dimensions().y, INF));
+            auto fScore = Array2D<double>(dim.x, std::vector<double>(dim.y, INF));
             fScore[start.x][start.y] = h(start, end);
 
             while (!openSet.empty()) {
