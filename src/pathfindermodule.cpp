@@ -30,7 +30,7 @@ static PyObject *dijkstra_handler(PyObject *self, PyObject *args) {
         return nullptr;
     }
 
-    auto grid = MapGrid<Vec2, bool>{
+    const auto grid = MapGrid<Vec2, bool>{
             static_cast<bool *>(PyArray_DATA(arr)),
             {PyArray_STRIDE(arr, 0), PyArray_STRIDE(arr, 1)},
             {PyArray_DIM(arr, 0), PyArray_DIM(arr, 1)}

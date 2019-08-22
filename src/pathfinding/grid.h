@@ -1,17 +1,18 @@
 #ifndef PATHFINDER_GRID_H
 #define PATHFINDER_GRID_H
 
+#include <array>
 #include "vector2.h"
 
 template<typename Vec, typename Cell>
 class MapGrid {
 public:
-    MapGrid(Cell *grid, Vec strides, Vec dimensions) :
+    MapGrid(const Cell *grid, Vec strides, Vec dimensions) :
             _grid(grid), _strides(strides), _dimensions(dimensions) {};
 
-    const Vec dimensions() const { return _dimensions; }
+    Vec dimensions() const { return _dimensions; }
 
-    bool get(Vec v) const {
+    bool get(Vec const &v) const {
         auto x = v.x;
         auto y = v.y;
 
@@ -25,17 +26,17 @@ public:
     }
 
 private:
-    Cell *_grid;
-    Vec _strides, _dimensions;
+    const Cell *_grid;
+    const Vec _strides, _dimensions;
 };
 
 template<typename Vec, typename Cell>
-bool inGrid(Vec p, MapGrid<Vec, Cell> const &grid) {
+bool inGrid(Vec const &p, MapGrid<Vec, Cell> const &grid) {
     auto dim = grid.dimensions();
     return p.x >= 0 && p.x < dim.x && p.y >= 0 && p.y < dim.y;
 }
 
-const Vector2<long> neighbors[]{
+Vector2<long> neighbors[]{
         {.x=1, .y=0},
         {.x=0, .y=-1},
         {.x=-1, .y=0},
@@ -48,7 +49,7 @@ const Vector2<long> neighbors[]{
 };
 
 template<typename Vec, typename Cell>
-std::vector<Vec> get_neighbors(Vec p, MapGrid<Vec, Cell> const &grid) {
+std::vector<Vec> get_neighbors(Vec const &p, MapGrid<Vec, Cell> const &grid) {
     std::vector<Vec> result;
     for (auto const &n : neighbors) {
         auto v = Vec{

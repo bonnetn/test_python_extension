@@ -15,7 +15,7 @@ namespace dijkstra {
         constexpr double INF = std::numeric_limits<double>::infinity();
 
         template<typename Vec2>
-        std::pair<Array2D<Vec2>, Array2D<double>> dijkstra(MapGrid<Vec2, bool> grid, Vec2 start, Vec2 end) {
+        std::pair<Array2D<Vec2>, Array2D<double>> dijkstra(MapGrid<Vec2, bool> const& grid, Vec2 const& start, Vec2 const& end) {
             /*
              * From https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm :
         1  function Dijkstra(Graph, source):
@@ -52,9 +52,9 @@ namespace dijkstra {
 
             while (!Q.empty()) {
                 auto element = Q.top();
-                auto u = element.v;
+                auto u = element.getV();
                 Q.pop();
-                if (element.dist != dist[u.x][u.y])
+                if (element.getDist() != dist[u.x][u.y])
                     continue;
 
                 for (auto v: get_neighbors(u, grid)) {
@@ -65,7 +65,7 @@ namespace dijkstra {
                     if (alt < dist[v.x][v.y]) {
                         dist[v.x][v.y] = alt;
                         prev[v.x][v.y] = u;
-                        Q.push({.v=v, .dist=alt});
+                        Q.push({v, alt});
 
                         if (v == end) {
                             return std::make_pair(prev, dist);
@@ -78,7 +78,7 @@ namespace dijkstra {
     }
 
     template<typename Vec2>
-    std::optional<std::vector<Vec2>> find_path(MapGrid<Vec2, bool> grid, Vec2 start, Vec2 end) {
+    std::optional<std::vector<Vec2>> find_path(MapGrid<Vec2, bool> const& grid, Vec2 const& start, Vec2 const& end) {
         auto[prev, dist] = dijkstra(grid, start, end);
 
         if (dist[end.x][end.y] == INF) {
