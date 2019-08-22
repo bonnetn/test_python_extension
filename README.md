@@ -74,3 +74,6 @@ Histogram using CPython extension:
 
 Histogram using "pathfinding" python library:
 ![Python library](img/python_lib.png?raw=true "Python library")
+
+Histogram using A* algorithm and CPython extension:
+![A* using extension](img/extension_astar.png?raw=true "Extension A star")
